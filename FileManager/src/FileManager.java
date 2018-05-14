@@ -1,4 +1,6 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileManager {
 
@@ -15,12 +17,12 @@ public class FileManager {
         return numberFiles;
     }
 
-    public static int calculateDirs(String path){
+    public static int calculateDirs(String path) {
         int numberDirectories = 0;
         File directory = new File(path);
         File[] dList = directory.listFiles();
 
-        for (File dir : dList){
+        for (File dir : dList) {
             if (dir.isDirectory()) {
                 numberDirectories++;
                 numberDirectories += calculateDirs(dir.getAbsolutePath());
@@ -57,9 +59,11 @@ public class FileManager {
         return state;
     }*/
 
-/* Данная реализация не позволит выполнять перезапись файла
-* */
-    private static final Integer BUFFER_SIZE = 1024;
+    /* Данная реализация не позволит выполнять перезапись файла
+     */
+
+/*
+  private static final Integer BUFFER_SIZE = 1024;
     public static boolean copy(String from, String to) throws IOException{
         boolean success = false;
         int fileLength;
@@ -85,5 +89,41 @@ public class FileManager {
             }
         } else return success;
         return success;
+    }
+*/
+
+    private static final Integer BUFFER_SIZE = 1024;
+//    private static String from = "d:\\source";
+//    private static String to = "d:\\dist";
+
+    public static boolean copy(String from, String to) throws IOException {
+
+        File directoryFrom = new File(from);
+        File directoryTo = new File(to);
+
+        if (directoryFrom.isDirectory() && directoryTo.exists() && directoryFrom.isDirectory()) {
+            File[] fList = directoryFrom.listFiles();
+//                File fileFrom = new File(from);
+//                File fileTo = new File(to);
+            if (fList != null) {
+                for (File file : fList) {
+                    File fileFrom = new File(from + "\\" + file);
+                    File fileTo = new File(from + "\\" + file);
+                    
+                    try {
+                        Path pathFrom = fileFrom.toPath();
+                        Path pathTo = fileTo.toPath();
+                        Files.copy(pathFrom, pathTo);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return false;
+                }
+            }
+        } else if (directoryFrom.isDirectory() && !directoryTo.exists()){
+            directoryTo.mkdir();
+        }
+        return true;
     }
 }
